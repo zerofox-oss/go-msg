@@ -1,5 +1,7 @@
 # go-msg
 
+[![Build Status](https://travis-ci.org/zerofoxlabs/go-msg.svg?branch=master)](https://travis-ci.org/zerofoxlabs/go-msg)
+
 **Pub/Sub Message Primitives for Go**
 
 This library contains
