@@ -1,5 +1,8 @@
 # go-msg
 
+[![GoDoc](https://godoc.org/github.com/zerofox-oss/go-msg?status.svg)](http://godoc.org/github.com/zerofox-oss/go-msg)
+[![Build Status](https://travis-ci.org/zerofox-oss/go-msg.svg?branch=master)](https://travis-ci.org/zerofox-oss/go-msg)
+
 **Pub/Sub Message Primitives for Go**
 
 This library contains
