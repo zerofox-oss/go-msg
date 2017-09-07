@@ -3,18 +3,8 @@ GOTOOLS = \
 	golang.org/x/tools/cmd/goimports
 
 PACKAGES=$(shell go list ./...)
-NEEDS_FORMAT=$(shell gofmt -l .)
 
-all: fmt imports vet lint test
-
-check-fmt:
-	@if [ "$(NEEDS_FORMAT)" != "" ] ; then \
-		echo $(NEEDS_FORMAT); \
-		exit 1; \
-	fi
-
-fmt:
-	go fmt $(PACKAGES)
+all: lint test
 
 help:
 	@echo ''
@@ -22,10 +12,8 @@ help:
 	@echo ''
 	@echo 'Available Targets are:'
 	@echo '  help		Shows this help screen.'
-	@echo '  check-fmt	List files whose format differs from gofmt'
-	@echo '  fmt		Run gofmt'
-	@echo '  lint		Run golint'
-	@echo '  imports	Run goimports'
+	@echo '  fmt		Reformat with gofmt and goimports'
+	@echo '  lint		Run golint, govet, goimports, check format with gofmt'
 	@echo '  tools		goget tools needed for commands'
 	@echo '  test		Run go test on all packages'
 	@echo '  vet		Run go vet on all packages'
@@ -34,19 +22,23 @@ help:
 	@echo ''
 
 lint: tools
-	@if [ "`golint ./... | grep -v -e '^vendor' -e '\.pb\.go'`" != "" ] ; then\
-		echo `golint ./... | grep -v -e '^vendor' -e '\.pb\.go'`; \
+	golint -set_exit_status $(PACKAGES)
+	goimports -l -e -d .
+	go vet ./...
+	$(eval NEEDS_FORMAT := $(shell gofmt -l .))
+	@if [ "$(NEEDS_FORMAT)" != "" ] ; then \
+		echo "$(NEEDS_FORMAT)"; \
 		exit 1; \
-	fi \
-
-imports: tools
-	goimports -l -w .
+	fi;
 
 test:
-	go test ./...
+	go test -v ./...
+
+fmt: tools
+	go fmt $(PACKAGES)
+	go imports -l -w
 
 tools:
 	go get -u -v $(GOTOOLS)
 
-vet:
-	go vet ./...
+.PHONY: help lint test fmt tools
