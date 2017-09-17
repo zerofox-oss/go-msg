@@ -32,7 +32,7 @@ lint: tools
 	fi;
 
 test:
-	go test -v ./...
+	go test -race -v ./...
 
 fmt: tools
 	go fmt $(PACKAGES)
