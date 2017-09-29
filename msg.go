@@ -164,3 +164,12 @@ type Topic interface {
 	// NewWriter returns a new MessageWriter
 	NewWriter() MessageWriter
 }
+
+// The TopicFunc is an adapter to allow the use of ordinary functions
+// as a Topic. TopicFunc(f) is a Topic that calls f.
+type TopicFunc func() MessageWriter
+
+// NewWriter calls f(ctx,m)
+func (t TopicFunc) NewWriter() MessageWriter {
+	return t()
+}
