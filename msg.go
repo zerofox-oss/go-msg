@@ -125,7 +125,7 @@ type Server interface {
 	//
 	// Serve will return ErrServerClosed after Shutdown completes. Additional
 	// error types should be considered to represent error conditions unique
-	// to the implemetnation of a specific technology.
+	// to the implementation of a specific technology.
 	//
 	// Serve() should continue to listen until Shutdown is called on
 	// the Server.
