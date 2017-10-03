@@ -1,4 +1,4 @@
-package mem
+package mem_test
 
 import (
 	"context"
@@ -6,7 +6,8 @@ import (
 	"fmt"
 	"sort"
 
-	msg "github.com/zerofox-oss/go-msg"
+	"github.com/zerofox-oss/go-msg"
+	"github.com/zerofox-oss/go-msg/mem"
 )
 
 func Example_primitives() {
@@ -14,8 +15,8 @@ func Example_primitives() {
 	c2 := make(chan *msg.Message, 10)
 	c3 := make(chan *msg.Message, 10)
 
-	t1, t2, t3 := Topic{C: c1}, Topic{C: c2}, Topic{C: c3}
-	srv1, srv2 := NewServer(c1, 1), NewServer(c2, 1)
+	t1, t2, t3 := mem.Topic{C: c1}, mem.Topic{C: c2}, mem.Topic{C: c3}
+	srv1, srv2 := mem.NewServer(c1, 1), mem.NewServer(c2, 1)
 
 	// split csv into separate messages for analysis
 	go func() {

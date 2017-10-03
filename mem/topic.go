@@ -12,6 +12,9 @@ type Topic struct {
 	C chan *msg.Message
 }
 
+// Ensure that Topic implements msg.Topic
+var _ msg.Topic = &Topic{}
+
 // NewWriter returns a MessageWriter.
 // The MessageWriter may be used to write messages to a channel.
 func (t *Topic) NewWriter() msg.MessageWriter {

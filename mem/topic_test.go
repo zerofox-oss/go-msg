@@ -1,13 +1,14 @@
-package mem
+package mem_test
 
 import (
 	"testing"
 
 	"github.com/zerofox-oss/go-msg"
+	"github.com/zerofox-oss/go-msg/mem"
 )
 
 func TestMessageWriter_Attributes(t *testing.T) {
-	testTopic := Topic{}
+	testTopic := &mem.Topic{}
 
 	w := testTopic.NewWriter()
 	attrs := w.Attributes()
@@ -20,7 +21,7 @@ func TestMessageWriter_Attributes(t *testing.T) {
 
 func TestMessageWriter_WriteAndClose(t *testing.T) {
 	channel := make(chan *msg.Message)
-	testTopic := Topic{
+	testTopic := &mem.Topic{
 		C: channel,
 	}
 
@@ -48,7 +49,7 @@ func TestMessageWriter_WriteAndClose(t *testing.T) {
 // asserts MessageWriter can only be used once
 func TestMesageWriter_SingleUse(t *testing.T) {
 	channel := make(chan *msg.Message)
-	testTopic := Topic{
+	testTopic := &mem.Topic{
 		C: channel,
 	}
 

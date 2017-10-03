@@ -27,6 +27,9 @@ type Server struct {
 	receiverCancelFunc context.CancelFunc
 }
 
+// Ensure that Server implements msg.Server
+var _ msg.Server = &Server{}
+
 // Serve always returns a non-nil error.
 // After Shutdown, the returned error is ErrServerClosed
 func (s *Server) Serve(r msg.Receiver) error {

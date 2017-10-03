@@ -1,4 +1,4 @@
-package mem
+package mem_test
 
 import (
 	"bytes"
@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/zerofox-oss/go-msg"
+	"github.com/zerofox-oss/go-msg/mem"
 )
 
 // ConcurrentReceiver writes to an channel upon consumption of a Message.
@@ -90,7 +91,7 @@ func TestServer_Serve(t *testing.T) {
 		},
 	}
 
-	srv := NewServer(make(chan *msg.Message, len(messages)), 1)
+	srv := mem.NewServer(make(chan *msg.Message, len(messages)), 1)
 
 	for _, m := range messages {
 		srv.C <- m
@@ -127,7 +128,7 @@ func TestServer_ServeConcurrency(t *testing.T) {
 		}
 	}
 
-	srv := NewServer(make(chan *msg.Message, len(messages)), 10)
+	srv := mem.NewServer(make(chan *msg.Message, len(messages)), 10)
 
 	for _, m := range messages {
 		srv.C <- m
@@ -163,7 +164,7 @@ func TestServer_ServeCanRetryMessages(t *testing.T) {
 		},
 	}
 
-	srv := NewServer(make(chan *msg.Message, len(messages)), 1)
+	srv := mem.NewServer(make(chan *msg.Message, len(messages)), 1)
 
 	for _, m := range messages {
 		srv.C <- m
@@ -203,7 +204,7 @@ func TestServer_ShutdownContextTimeoutExceeded(t *testing.T) {
 		Body:       bytes.NewBufferString("hello world!"),
 	}
 
-	srv := NewServer(make(chan *msg.Message, 1), 1)
+	srv := mem.NewServer(make(chan *msg.Message, 1), 1)
 	defer close(srv.C)
 
 	receiver := msg.ReceiverFunc(func(ctx context.Context, m *msg.Message) error {
