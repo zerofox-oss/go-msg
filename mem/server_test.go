@@ -29,21 +29,6 @@ func (r *ConcurrentReceiver) Receive(ctx context.Context, m *msg.Message) error 
 	return nil
 }
 
-// PanicReceiver panics upon consumption of a message.
-// It is safe to utilize by concurrent goroutines.
-type PanicReceiver struct {
-	t *testing.T
-}
-
-func (r *PanicReceiver) Receive(ctx context.Context, m *msg.Message) error {
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	default:
-		panic("AHHH")
-	}
-}
-
 // RetryReceiver returns an error upon consumption of a Message. Once it
 // has been called a certain number of times, it writes to an channel and
 // returns nil.
