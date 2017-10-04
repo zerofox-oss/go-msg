@@ -162,14 +162,17 @@ type MessageWriter interface {
 // Multiple goroutines may invoke method on a Topic simultaneously.
 type Topic interface {
 	// NewWriter returns a new MessageWriter
-	NewWriter() MessageWriter
+	NewWriter(context.Context) MessageWriter
 }
 
 // The TopicFunc is an adapter to allow the use of ordinary functions
 // as a Topic. TopicFunc(f) is a Topic that calls f.
-type TopicFunc func() MessageWriter
+type TopicFunc func(context.Context) MessageWriter
+
+// Ensure TopicFunc implements Topic
+var _ Topic = TopicFunc(nil)
 
 // NewWriter calls f(ctx,m)
-func (t TopicFunc) NewWriter() MessageWriter {
-	return t()
+func (t TopicFunc) NewWriter(ctx context.Context) MessageWriter {
+	return t(ctx)
 }

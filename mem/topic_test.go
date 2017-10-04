@@ -1,6 +1,7 @@
 package mem_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/zerofox-oss/go-msg"
@@ -10,7 +11,7 @@ import (
 func TestMessageWriter_Attributes(t *testing.T) {
 	testTopic := &mem.Topic{}
 
-	w := testTopic.NewWriter()
+	w := testTopic.NewWriter(context.Background())
 	attrs := w.Attributes()
 	attrs.Set("test", "value")
 
@@ -26,7 +27,7 @@ func TestMessageWriter_WriteAndClose(t *testing.T) {
 	}
 
 	go func() {
-		w := testTopic.NewWriter()
+		w := testTopic.NewWriter(context.Background())
 		w.Write([]byte("Don't "))
 		w.Write([]byte("call me "))
 		w.Write([]byte("junior!"))
@@ -53,7 +54,7 @@ func TestMesageWriter_SingleUse(t *testing.T) {
 		C: channel,
 	}
 
-	w := testTopic.NewWriter()
+	w := testTopic.NewWriter(context.Background())
 
 	text := [][]byte{
 		[]byte("I have a bad feeling about this..."),
