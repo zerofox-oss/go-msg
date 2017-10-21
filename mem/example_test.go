@@ -28,7 +28,7 @@ func Example_primitives() {
 
 			for _, row := range lines {
 				for _, col := range row {
-					w := t2.NewWriter()
+					w := t2.NewWriter(ctx)
 					w.Write([]byte(col))
 					w.Close()
 				}
@@ -45,7 +45,7 @@ func Example_primitives() {
 				return err
 			}
 
-			w := t3.NewWriter()
+			w := t3.NewWriter(ctx)
 			w.Attributes().Set("Length", fmt.Sprintf("%d", len(body)))
 			w.Attributes().Set("StartsWith", string(body[0:1]))
 
@@ -67,7 +67,7 @@ func Example_primitives() {
 	}
 
 	for _, m := range messages {
-		w := t1.NewWriter()
+		w := t1.NewWriter(context.Background())
 		w.Write(m)
 		w.Close()
 	}
