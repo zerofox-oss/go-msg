@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/zerofox-oss/go-msg"
-	"github.com/zerofox-oss/go-msg/mem"
+	"github.com/zerofox-oss/go-msg/backends/mem"
 )
 
 // ConcurrentReceiver writes to an channel upon consumption of a Message.

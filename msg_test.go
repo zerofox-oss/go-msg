@@ -2,7 +2,9 @@ package msg_test
 
 import (
 	"io/ioutil"
+	"net/textproto"
 	"os"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -13,6 +15,52 @@ const expected = "hello world"
 
 func TestMain(m *testing.M) {
 	os.Exit(m.Run())
+}
+
+func TestGetAttribute(t *testing.T) {
+	a := msg.Attributes{}
+
+	// doesn't return if nothing is there
+	if v := a.Get("foo"); v != "" {
+		t.Errorf("expected nothing, got %s", v)
+	}
+
+	// returns if something is there
+	a.Set("foo", "bar")
+	if v := a.Get("foo"); v != "bar" {
+		t.Errorf("expected bar, got %s", v)
+	}
+
+	// returns if something is there (case is different)
+	if v := a.Get("FOO"); v != "bar" {
+		t.Errorf("expected bar, got %s", v)
+	}
+}
+
+func TestSetAttribute(t *testing.T) {
+	a := msg.Attributes{}
+
+	// if k/v not set, set it
+	k := textproto.CanonicalMIMEHeaderKey("foo")
+
+	a.Set("foo", "bar")
+	if v := a[k]; !reflect.DeepEqual(v, []string{"bar"}) {
+		t.Errorf("expected bar, got %s", v)
+	}
+
+	// if same key, override value
+	a.Set("foo", "baz")
+	if v := a[k]; !reflect.DeepEqual(v, []string{"baz"}) {
+		t.Errorf("expected baz, got %s", v)
+	}
+
+	// if same key (different case), override value
+	k = textproto.CanonicalMIMEHeaderKey("FOO")
+
+	a.Set("FOO", "bin")
+	if v := a[k]; !reflect.DeepEqual(v, []string{"bin"}) {
+		t.Errorf("expected bin, got %s", v)
+	}
 }
 
 func TestDumpBody(t *testing.T) {
@@ -48,34 +96,29 @@ func TestCloneBody(t *testing.T) {
 func TestWithBody(t *testing.T) {
 	m := &msg.Message{
 		Attributes: msg.Attributes{},
-		Body:       strings.NewReader("world hello"),
+		Body:       strings.NewReader("hello world"),
 	}
-	// This panics if m.Attributes is nil
-	m.Attributes.Set("hello", "world")
-	b, err := msg.DumpBody(m)
+	m.Attributes.Set("foo", "bar")
+
+	mm := msg.WithBody(m, strings.NewReader("hello new world"))
+	body, err := msg.DumpBody(mm)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if string(b) == expected {
-		t.Errorf("Dumped body shouldn't match expected, but: %s == %s", expected, string(b))
-	}
-	mm := msg.WithBody(m, strings.NewReader(expected))
-	bb, err := msg.DumpBody(mm)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if string(bb) != expected {
-		t.Errorf("Dumped body does not match expected: %s != %s", expected, string(bb))
-	}
-	if mm.Attributes.Get("hello") != "world" {
+
+	// assert attributes are copied but body is new
+	if mm.Attributes.Get("foo") != "bar" {
 		t.Errorf("Attributes failed to copy")
 	}
-	mm.Attributes.Set("test", "one")
-	m.Attributes.Set("test", "two")
+	if string(body) != "hello new world" {
+		t.Errorf("body does not match expected %s", string(body))
+	}
+
+	// assert that message attributes are not shared
+	m.Attributes.Set("test", "one")
+	mm.Attributes.Set("test", "two")
 
 	if m.Attributes.Get("test") == mm.Attributes.Get("test") {
-		t.Errorf("The two message attributes should not affect each other %s == %s",
-			m.Attributes.Get("test"),
-			mm.Attributes.Get("test"))
+		t.Errorf("message attributes should not be the same")
 	}
 }

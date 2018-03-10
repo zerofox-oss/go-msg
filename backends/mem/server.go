@@ -35,11 +35,7 @@ var _ msg.Server = &Server{}
 func (s *Server) Serve(r msg.Receiver) error {
 	for {
 		select {
-
-		// shutdown listener to prevent new messages from being received
 		case <-s.listenerCtx.Done():
-			log.Printf("exiting")
-
 			close(s.maxConcurrentReceives)
 			return msg.ErrServerClosed
 
@@ -57,7 +53,7 @@ func (s *Server) Serve(r msg.Receiver) error {
 				}()
 
 				if err := r.Receive(ctx, m); err != nil {
-					log.Printf("[ERROR] Receiver error: %v; retrying...", err)
+					log.Printf("could not receive message %s", err)
 					s.C <- m
 				}
 			}(s.receiverCtx, m)
