@@ -32,8 +32,9 @@ that are currently supported:
 
 | Backend       | Link     |
 | :------------- | :------------- |
-| Channel-based  | [go-msg/mem](https://github.com/zerofox-oss/go-msg) |
-| Amazon AWS (SNS,SQS) | [go-aws-msg](https://github.com/zerofox-oss/go-aws-msg) |
+| Channels  | https://github.com/zerofox-oss/go-msg/backends/mem |
+| AWS (SNS,SQS) | https://github.com/zerofox-oss/go-aws-msg |
+| Google PubSub | https://github.com/paultyng/go-msg-pubsub |
 
 ## How it works
 
