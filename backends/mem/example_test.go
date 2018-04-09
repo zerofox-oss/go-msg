@@ -7,7 +7,7 @@ import (
 	"sort"
 
 	"github.com/zerofox-oss/go-msg"
-	"github.com/zerofox-oss/go-msg/mem"
+	"github.com/zerofox-oss/go-msg/backends/mem"
 )
 
 func Example_primitives() {

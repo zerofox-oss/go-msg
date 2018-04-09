@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/zerofox-oss/go-msg"
-	"github.com/zerofox-oss/go-msg/mem"
+	"github.com/zerofox-oss/go-msg/backends/mem"
 )
 
 func TestMessageWriter_Attributes(t *testing.T) {
