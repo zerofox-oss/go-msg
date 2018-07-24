@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+option go_package = "vault";
+
+message EncryptedMessage {
+    string Backend     = 1;
+    string Key         = 2;
+    string CipherText  = 3;
+}

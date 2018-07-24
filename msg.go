@@ -176,3 +176,12 @@ var _ Topic = TopicFunc(nil)
 func (t TopicFunc) NewWriter(ctx context.Context) MessageWriter {
 	return t(ctx)
 }
+
+// The TopicFunc is an adapter to allow the use of ordinary functions
+// as a Topic. TopicFunc(f) is a Topic that calls f.
+type TopicFunc func() MessageWriter
+
+// NewWriter calls f(ctx,m)
+func (t TopicFunc) NewWriter() MessageWriter {
+	return t()
+}
