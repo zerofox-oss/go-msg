@@ -63,10 +63,10 @@ func TestMesageWriter_SingleUse(t *testing.T) {
 
 	go func() {
 		if _, err := w.Write(text[0]); err != nil {
-			t.Fatal(err)
+			t.Error(err)
 		}
 		if err := w.Close(); err != nil {
-			t.Fatal(err)
+			t.Error(err)
 		}
 
 		// second write, close should fail

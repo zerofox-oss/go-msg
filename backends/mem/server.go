@@ -63,7 +63,7 @@ func (s *Server) Serve(r msg.Receiver) error {
 
 // shutdownPollInterval is how often we poll for quiescence
 // during Server.Shutdown.
-var shutdownPollInterval = 50 * time.Millisecond
+const shutdownPollInterval = 50 * time.Millisecond
 
 // Shutdown attempts to gracefully shut down the Server without
 // interrupting any messages in flight.
