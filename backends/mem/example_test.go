@@ -20,7 +20,7 @@ func Example_primitives() {
 
 	// split csv into separate messages for analysis
 	go func() {
-		srv1.Serve(msg.ReceiverFunc(func(ctx context.Context, m *msg.Message) error {
+		splitFunc := msg.ReceiverFunc(func(ctx context.Context, m *msg.Message) error {
 			lines, err := csv.NewReader(m.Body).ReadAll()
 			if err != nil {
 				return err
@@ -34,12 +34,13 @@ func Example_primitives() {
 				}
 			}
 			return nil
-		}))
+		})
+		srv1.Serve(splitFunc)
 	}()
 
 	// perform some analysis on each message
 	go func() {
-		srv2.Serve(msg.ReceiverFunc(func(ctx context.Context, m *msg.Message) error {
+		analyzeFunc := msg.ReceiverFunc(func(ctx context.Context, m *msg.Message) error {
 			body, err := msg.DumpBody(m)
 			if err != nil {
 				return err
@@ -58,7 +59,8 @@ func Example_primitives() {
 			}
 			w.Write(body)
 			return w.Close()
-		}))
+		})
+		srv2.Serve(analyzeFunc)
 	}()
 
 	messages := [][]byte{

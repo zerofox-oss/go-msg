@@ -31,9 +31,5 @@ func Decoder(next msg.Receiver) msg.Receiver {
 // Note: MIMEHeader.Get() is used to fetch this value. In the case of a list of
 // values, .Get() returns the 0th value.
 func isBase64Encoded(m *msg.Message) bool {
-	if m.Attributes.Get("Content-Transfer-Encoding") == "base64" {
-		return true
-	}
-
-	return false
+	return m.Attributes.Get("Content-Transfer-Encoding") == "base64"
 }

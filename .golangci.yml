@@ -1,0 +1,6 @@
+linters:
+  enable-all: true
+run:
+  skip-dirs:
+    - vendor
+  tests: false

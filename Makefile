@@ -2,23 +2,17 @@ PACKAGES=$(shell go list ./...)
 
 all: lint test
 
-go-lint:
-	go get -u github.com/alecthomas/gometalinter
-	gometalinter --install --force
+init: tools
+	GO111MODULE=on go mod vendor
 
-lint: go-lint
-	gometalinter \
-		--disable-all \
-		--enable=gofmt \
-		--enable=goimports \
-		--enable=golint \
-		--enable=misspell \
-		--enable=vetshadow \
-		--tests \
-		./...
+lint: init
+	golangci-lint run ./...
 
-test:
+test: init
 	go test -race -v ./...
+
+tools:
+	curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(GOPATH)/bin v1.17.0
 
 fmt: tools
 	go fmt $(PACKAGES)

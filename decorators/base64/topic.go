@@ -37,7 +37,7 @@ func (w *encodeWriter) Close() error {
 	w.mux.Lock()
 	defer w.mux.Unlock()
 
-	if w.closed == true {
+	if w.closed {
 		return msg.ErrClosedMessageWriter
 	}
 	w.closed = true
@@ -60,7 +60,7 @@ func (w *encodeWriter) Write(b []byte) (int, error) {
 	w.mux.Lock()
 	defer w.mux.Unlock()
 
-	if w.closed == true {
+	if w.closed {
 		return 0, msg.ErrClosedMessageWriter
 	}
 	return w.buf.Write(b)
