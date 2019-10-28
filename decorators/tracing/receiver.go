@@ -35,10 +35,8 @@ func WithStartOption(so trace.StartOptions) Option {
 func Receiver(next msg.Receiver, opts ...Option) msg.Receiver {
 
 	options := &Options{
-		SpanName: "msg.Receiver",
-		StartOptions: trace.StartOptions{
-			Sampler: trace.AlwaysSample(),
-		},
+		SpanName:     "msg.Receiver",
+		StartOptions: trace.StartOptions{},
 	}
 
 	for _, opt := range opts {
