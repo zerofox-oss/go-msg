@@ -26,10 +26,8 @@ func msgAttributesToTrace(msgAttributes msg.Attributes) []trace.Attribute {
 func Topic(next msg.Topic, opts ...Option) msg.Topic {
 
 	options := &Options{
-		SpanName: "msg.MessageWriter",
-		StartOptions: trace.StartOptions{
-			Sampler: trace.AlwaysSample(),
-		},
+		SpanName:     "msg.MessageWriter",
+		StartOptions: trace.StartOptions{},
 	}
 
 	for _, opt := range opts {
