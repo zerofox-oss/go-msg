@@ -89,3 +89,23 @@ func TestMesageWriter_SingleUse(t *testing.T) {
 		t.Errorf("expected %s got %s", string(text[0]), string(body))
 	}
 }
+
+// asserts MessageWriter does not emit an empty message on Close if Write was never called.
+func TestMesageWriter_CloseEmpty(t *testing.T) {
+	channel := make(chan *msg.Message)
+	testTopic := &mem.Topic{
+		C: channel,
+	}
+
+	w := testTopic.NewWriter(context.Background())
+
+	if err := w.Close(); err != nil {
+		t.Error(err)
+	}
+
+	count := len(channel)
+
+	if count != 0 {
+		t.Errorf("got %d messages in channel, wanted 0", count)
+	}
+}
