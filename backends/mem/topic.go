@@ -56,11 +56,13 @@ func (w *MessageWriter) Close() error {
 	}
 	w.closed = true
 
-	msg := &msg.Message{
-		Attributes: w.attributes,
-		Body:       w.buf,
+	if w.buf.Len() > 0 {
+		msg := &msg.Message{
+			Attributes: w.attributes,
+			Body:       w.buf,
+		}
+		w.c <- msg
 	}
-	w.c <- msg
 
 	return nil
 }
