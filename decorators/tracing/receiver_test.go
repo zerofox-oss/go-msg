@@ -244,3 +244,80 @@ func TestDecoder_SuccessfullySetsSpanWhenInvalidTraceContextBinary(t *testing.T)
 	}
 	<-testFinish
 }
+
+// Tests that when a Receiver is wrapped by TracingReceiver, and tracecontext
+// is present, along with a trace state a span is started and set in the
+// receive context with the correct parent context and state
+func TestDecoder_SuccessfullyDecodesSpanWhenTraceContextAndSpanIsPresent(t *testing.T) {
+	testFinish := make(chan struct{})
+	msgChan := make(chan msgWithContext)
+	r := Receiver(ChanReceiver{
+		c: msgChan,
+	})
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	sc, b64Sc := makeSpanContext()
+
+	// Construct a message with base64 encoding (YWJjMTIz == abc123)
+	m := &msg.Message{
+		Body:       bytes.NewBufferString("hello"),
+		Attributes: msg.Attributes{},
+	}
+	m.Attributes.Set("Tracecontext", b64Sc)
+	m.Attributes.Set("Tracestate", "debug=true,log=false")
+
+	// Wait for ChanReceiver to write the message to msgChan, assert on the body
+	go func() {
+		result := <-msgChan
+
+		expectedBody := "hello"
+		actual, _ := ioutil.ReadAll(result.msg.Body)
+		if string(actual) != expectedBody {
+			t.Errorf("Expected Body to be %v, got %v", expectedBody, string(actual))
+		}
+
+		span := trace.FromContext(result.ctx)
+		if span == nil {
+			t.Errorf("span was not expected to be nil")
+		}
+
+		receivedSC := span.SpanContext()
+
+		if receivedSC.TraceID != sc.TraceID {
+			t.Errorf(cmp.Diff(receivedSC.TraceID, sc.TraceID))
+		}
+
+		if receivedSC.Tracestate == nil {
+			t.Errorf("tracestate was nil, expecting non-nil")
+		}
+
+		receivedTS := receivedSC.Tracestate
+
+		entries := receivedTS.Entries()
+		if len(entries) != 2 {
+			t.Errorf("expected tracestate entries to be 2")
+		}
+
+		e1 := receivedTS.Entries()[0]
+		if e1.Key != "debug" || e1.Value != "true" {
+			t.Errorf("tracestate entry unexpected, got %s %s", e1.Key, e1.Value)
+		}
+
+		e2 := receivedTS.Entries()[1]
+		if e2.Key != "log" || e2.Value != "false" {
+			t.Errorf("tracestate entry unexpected, got %s %s", e2.Key, e2.Value)
+		}
+
+		testFinish <- struct{}{}
+	}()
+
+	// Receive the message!
+	err := r.Receive(ctx, m)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	<-testFinish
+}
