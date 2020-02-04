@@ -95,6 +95,11 @@ func (w *tracingWriter) Close() error {
 		span.AddAttributes(msgAttributesToTrace(attrs)...)
 
 		attrs.Set(traceContextKey, string(traceBuf))
+		tracestateString := tracestateToString(sc)
+		if tracestateString != "" {
+			attrs.Set(traceStateKey, tracestateToString(sc))
+		}
+
 		span.Annotate([]trace.Attribute{}, fmt.Sprintf("%q", dataToWrite))
 
 	}

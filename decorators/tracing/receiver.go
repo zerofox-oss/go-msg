@@ -10,6 +10,7 @@ import (
 )
 
 const traceContextKey = "Tracecontext"
+const traceStateKey = "Tracestate"
 
 type Options struct {
 	SpanName     string
@@ -73,6 +74,12 @@ func withContext(ctx context.Context, m *msg.Message, options *Options) (context
 	spanContext, ok := propagation.FromBinary(traceContext)
 	if !ok {
 		return trace.StartSpan(ctx, options.SpanName, trace.WithSampler(startOptions.Sampler))
+	}
+
+	traceStateString := m.Attributes.Get(traceStateKey)
+	if traceStateString != "" {
+		ts := tracestateFromString(traceStateString)
+		spanContext.Tracestate = ts
 	}
 
 	return trace.StartSpanWithRemoteParent(ctx, options.SpanName, spanContext, trace.WithSampler(startOptions.Sampler))
