@@ -2,6 +2,7 @@ package tracing_test
 
 import (
 	"context"
+	"sync"
 	"testing"
 
 	"github.com/zerofox-oss/go-msg"
@@ -63,10 +64,14 @@ func verifyEncodeDecode(
 	topic := mem.Topic{C: c1}
 	srv := mem.NewServer(c1, 1)
 
+	var lock sync.RWMutex
+
 	receivedMessages := []message{}
 	go func() {
 		srv.Serve(receiveDecorator(msg.ReceiverFunc(func(ctx context.Context, m *msg.Message) error {
+			lock.Lock()
 			receivedMessages = append(receivedMessages, message{ctx: ctx, m: m})
+			lock.Unlock()
 			return nil
 		})))
 	}()
@@ -84,7 +89,9 @@ func verifyEncodeDecode(
 	srv.Shutdown(context.Background())
 
 	for i, expectedTraceID := range expectedTraces {
+		lock.RLock()
 		m := receivedMessages[i]
+		lock.RUnlock()
 		traceID := spanReader(m.ctx)
 		if traceID != expectedTraceID {
 			t.Errorf("received span did not have the expected id %s != %s", traceID, expectedTraceID)
