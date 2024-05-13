@@ -3,6 +3,7 @@ module github.com/zerofox-oss/go-msg
 go 1.21
 
 require (
+	github.com/JimWen/gods-generic v0.10.2
 	github.com/google/go-cmp v0.6.0
 	github.com/pierrec/lz4/v4 v4.1.8
 	go.opencensus.io v0.24.0
