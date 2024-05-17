@@ -24,7 +24,6 @@ func msgAttributesToTrace(msgAttributes msg.Attributes) []trace.Attribute {
 // Topic wraps a msg.Topic, attaching any tracing data
 // via msg.Attributes to send downstream
 func Topic(next msg.Topic, opts ...Option) msg.Topic {
-
 	options := &Options{
 		SpanName:     "msg.MessageWriter",
 		StartOptions: trace.StartOptions{},

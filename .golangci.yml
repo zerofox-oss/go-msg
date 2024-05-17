@@ -1,6 +1,4 @@
 linters:
-  enable-all: true
-run:
-  skip-dirs:
-    - vendor
-  tests: false
+  disable-all: true
+  presets:
+   - format

@@ -1,6 +1,6 @@
 // Tracing provides decorators which enable distributed tracing
 //
-// How it works
+// # How it works
 //
 // This package provides two decorators which can be used to
 // propagate tracing information. The topic decorator "tracing.Topic"
@@ -11,7 +11,7 @@
 // provide handle messages. Again if to trace is present a trace is started and
 // set in the context.
 //
-// Examples
+// # Examples
 //
 // Using the tracing.Topic:
 //
@@ -25,14 +25,13 @@
 //
 // Using the tracing.Receiver:
 //
-//	func ExampleReceiver() {
-//      receiver := msg.Receiver(func(ctx context.Context, m *msg.Message) error {
-//          // your receiver implementation
-//          // ctx will contain tracing information
-//          // once decorated
-//      })
-//      receiver := tracing.Receiver(receiver)
-//      // use receiver as you would without tracing
-//	}
-//
+//		func ExampleReceiver() {
+//	     receiver := msg.Receiver(func(ctx context.Context, m *msg.Message) error {
+//	         // your receiver implementation
+//	         // ctx will contain tracing information
+//	         // once decorated
+//	     })
+//	     receiver := tracing.Receiver(receiver)
+//	     // use receiver as you would without tracing
+//		}
 package tracing

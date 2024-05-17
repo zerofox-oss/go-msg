@@ -9,7 +9,6 @@ import (
 
 	"github.com/zerofox-oss/go-msg"
 	"go.opencensus.io/trace/propagation"
-
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	ocbridge "go.opentelemetry.io/otel/bridge/opencensus"
@@ -47,7 +46,6 @@ func (m msgAttributesTextCarrier) Keys() []string {
 // Topic wraps a msg.Topic, attaching any tracing data
 // via msg.Attributes to send downstream
 func Topic(next msg.Topic, opts ...Option) msg.Topic {
-
 	options := &Options{
 		SpanName: "msg.MessageWriter",
 	}

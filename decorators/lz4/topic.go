@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"github.com/pierrec/lz4/v4"
-
 	"github.com/zerofox-oss/go-msg"
 )
 

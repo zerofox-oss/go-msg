@@ -9,8 +9,10 @@ import (
 	"go.opencensus.io/trace/propagation"
 )
 
-const traceContextKey = "Tracecontext"
-const traceStateKey = "Tracestate"
+const (
+	traceContextKey = "Tracecontext"
+	traceStateKey   = "Tracestate"
+)
 
 type Options struct {
 	SpanName     string
@@ -34,7 +36,6 @@ func WithStartOption(so trace.StartOptions) Option {
 // Receiver Wraps another msg.Receiver, populating
 // the context with any upstream tracing information.
 func Receiver(next msg.Receiver, opts ...Option) msg.Receiver {
-
 	options := &Options{
 		SpanName:     "msg.Receiver",
 		StartOptions: trace.StartOptions{},

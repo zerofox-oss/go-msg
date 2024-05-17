@@ -6,15 +6,14 @@ import (
 	"testing"
 
 	"github.com/zerofox-oss/go-msg"
+	"github.com/zerofox-oss/go-msg/backends/mem"
+	"github.com/zerofox-oss/go-msg/decorators/otel/tracing"
+	octracing "github.com/zerofox-oss/go-msg/decorators/tracing"
 	octrace "go.opencensus.io/trace"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
-
-	"github.com/zerofox-oss/go-msg/backends/mem"
-	"github.com/zerofox-oss/go-msg/decorators/otel/tracing"
-	octracing "github.com/zerofox-oss/go-msg/decorators/tracing"
 )
 
 type message struct {
@@ -59,7 +58,6 @@ func verifyEncodeDecode(
 	spanCreator func() (context.Context, string, func()),
 	spanReader func(context.Context) string,
 ) {
-
 	c1 := make(chan *msg.Message)
 	topic := mem.Topic{C: c1}
 	srv := mem.NewServer(c1, 1)
@@ -97,11 +95,9 @@ func verifyEncodeDecode(
 			t.Errorf("received span did not have the expected id %s != %s", traceID, expectedTraceID)
 		}
 	}
-
 }
 
 func TestTopicAndReceiverCompatability(t *testing.T) {
-
 	tp := tracesdk.NewTracerProvider()
 
 	otel.SetTextMapPropagator(propagation.TraceContext{})

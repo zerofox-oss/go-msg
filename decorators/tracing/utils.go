@@ -20,7 +20,7 @@ const (
 var trimOWSRegExp = regexp.MustCompile(trimOWSRegexFmt) // nolint
 
 func tracestateToString(sc trace.SpanContext) string {
-	var pairs = make([]string, 0, len(sc.Tracestate.Entries()))
+	pairs := make([]string, 0, len(sc.Tracestate.Entries()))
 	if sc.Tracestate != nil {
 		for _, entry := range sc.Tracestate.Entries() {
 			pairs = append(pairs, strings.Join([]string{entry.Key, entry.Value}, "="))

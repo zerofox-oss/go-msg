@@ -12,7 +12,6 @@ import (
 	"github.com/zerofox-oss/go-msg"
 	"go.opencensus.io/trace"
 	"go.opencensus.io/trace/propagation"
-
 	ocbridge "go.opentelemetry.io/otel/bridge/opencensus"
 	oteltrace "go.opentelemetry.io/otel/trace"
 )

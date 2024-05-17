@@ -15,7 +15,6 @@ import (
 )
 
 func TestTopic__SucessfullyInsertsTraceContext(t *testing.T) {
-
 	tp := tracesdk.NewTracerProvider()
 	otel.SetTextMapPropagator(propagation.TraceContext{})
 	otel.SetTracerProvider(tp)
@@ -61,7 +60,6 @@ func TestTopic__SucessfullyInsertsTraceContext(t *testing.T) {
 }
 
 func TestTopic__SucessfullyInsertsOtelContext(t *testing.T) {
-
 	tp := tracesdk.NewTracerProvider()
 	otel.SetTextMapPropagator(propagation.TraceContext{})
 	otel.SetTracerProvider(tp)
