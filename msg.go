@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"net/textproto"
+	"time"
 )
 
 // Attributes represent the key-value metadata for a Message.
@@ -111,8 +113,18 @@ func (f ReceiverFunc) Receive(ctx context.Context, m *Message) error {
 	return f(ctx, m)
 }
 
-// ErrServerClosed represents a completed Shutdown
+// ErrServerClosed represents a completed shutdown
 var ErrServerClosed = errors.New("msg: server closed")
+
+// ErrServerThrottled signals that the server should sleep before resuming work.
+type ErrServerThrottled struct {
+	Message  string
+	Duration time.Duration
+}
+
+func (e ErrServerThrottled) Error() string {
+	return fmt.Sprintf("error: %s - server throttled for %s", e.Message, e.Duration)
+}
 
 // A Server serves messages to a receiver.
 type Server interface {
