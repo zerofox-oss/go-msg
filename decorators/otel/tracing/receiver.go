@@ -6,17 +6,17 @@ import (
 
 	"github.com/zerofox-oss/go-msg"
 	"go.opencensus.io/trace/propagation"
-
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/trace"
-
 	ocbridge "go.opentelemetry.io/otel/bridge/opencensus"
+	"go.opentelemetry.io/otel/trace"
 )
 
 var tracer = otel.Tracer("github.com/zerofox-oss/go-msg/decorators/otel")
 
-const traceContextKey = "Tracecontext"
-const traceStateKey = "Tracestate"
+const (
+	traceContextKey = "Tracecontext"
+	traceStateKey   = "Tracestate"
+)
 
 type Options struct {
 	SpanName     string
@@ -47,7 +47,6 @@ func WithOnlyOtel(onlyOtel bool) Option {
 // Receiver Wraps another msg.Receiver, populating
 // the context with any upstream tracing information.
 func Receiver(next msg.Receiver, opts ...Option) msg.Receiver {
-
 	options := &Options{
 		SpanName: "msg.Receiver",
 	}
@@ -70,7 +69,6 @@ func Receiver(next msg.Receiver, opts ...Option) msg.Receiver {
 // which contains the created span well as the span itself
 // is returned
 func withContext(ctx context.Context, m *msg.Message, options *Options) (context.Context, trace.Span) {
-
 	textCarrier := msgAttributesTextCarrier{attributes: &m.Attributes}
 	tmprop := otel.GetTextMapPropagator()
 

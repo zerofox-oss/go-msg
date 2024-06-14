@@ -47,7 +47,8 @@ type Message struct {
 
 // WithBody creates a new Message with the given io.Reader as a Body
 // containing the parent's Attributes.
-// 	p := &Message{
+//
+//	p := &Message{
 //		Attributes: Attributes{},
 //		Body: strings.NewReader("hello world"),
 //	}
