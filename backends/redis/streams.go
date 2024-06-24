@@ -32,35 +32,33 @@ type Server struct {
 }
 
 func (s *Server) Serve(r msg.Receiver) error {
-	// XREADGROUP specifies a STREAMS <id> parameter which controls how messages are read.
-	// Passing "0" means it will read pending messages in the consumer group which were not XACK'd.
-	// This can happen if the server crashes.
-	// We will read in this mode until all pending messages are gone.
-	// Then we can switch to ID = ">", which means read new messages.
-	var streamID = ">"
-
 	for {
 		select {
 		case <-s.serverCtx.Done():
 			close(s.inFlightQueue)
-
+			log.Printf("closing server")
 			return msg.ErrServerClosed
 		default:
-			ctx, cancel := context.WithTimeout(s.receiverCtx, 30*time.Second)
-			defer cancel()
+			log.Printf("XREADGROUP")
 
-			resp := s.conn.XReadGroup(ctx, &redis.XReadGroupArgs{
-				Group:    s.Group,
-				Consumer: s.Consumer,
-				Streams:  []string{s.Stream, streamID},
-				Count:    int64(10),
-			})
-			if err := resp.Err(); err != nil {
-				return fmt.Errorf("failed to read messages with: %w", err)
+			messages, err := s.xReadGroup()
+			if err != nil {
+				return err
+			}
+
+			// log.Printf("XREADGROUP returned %d messages", len(messages))
+
+			if len(messages) == 0 {
+				messages, err = s.xAutoclaim()
+				if err != nil {
+					return err
+				}
+
+				// log.Printf("XAUTOCLAIM returned %d messages", len(messages))
 			}
 
 			// otherwise, we have messages to process
-			for _, m := range resp.Val()[0].Messages {
+			for _, m := range messages {
 				s.inFlightQueue <- struct{}{}
 
 				go func(m redis.XMessage) {
@@ -68,13 +66,61 @@ func (s *Server) Serve(r msg.Receiver) error {
 						<-s.inFlightQueue
 					}()
 
-					if err := s.process(m, r); err != nil {
-						log.Println(err)
-					}
+					s.process(m, r)
 				}(m)
 			}
 		}
 	}
+}
+
+func (s *Server) xAutoclaim() ([]redis.XMessage, error) {
+	ctx, cancel := context.WithTimeout(s.receiverCtx, 1*time.Second)
+	defer cancel()
+
+	messages, _, err := s.conn.XAutoClaim(ctx, &redis.XAutoClaimArgs{
+		Stream:   s.Stream,
+		Group:    s.Group,
+		Consumer: s.Consumer,
+
+		// MinIdle == Message Visibility Timeout (SQS)
+		MinIdle: 3 * time.Second,
+		Start:   "0",
+		Count:   int64(10),
+	}).Result()
+	if err != nil {
+		if err != redis.Nil {
+			return nil, fmt.Errorf("XAUTOCLAIM failed with: %w", err)
+		}
+		return []redis.XMessage{}, nil
+	}
+
+	return messages, nil
+}
+
+func (s *Server) xReadGroup() ([]redis.XMessage, error) {
+	ctx, cancel := context.WithTimeout(s.receiverCtx, 100*time.Millisecond)
+	defer cancel()
+
+	resp, err := s.conn.XReadGroup(ctx, &redis.XReadGroupArgs{
+		Group:    s.Group,
+		Consumer: s.Consumer,
+		Streams:  []string{s.Stream, ">"},
+		Count:    int64(10),
+
+		// This effectively limits the server to poll at most once a second.
+		// https://github.com/redis/go-redis/issues/1941
+		// https://stackoverflow.com/questions/64801757/redis-streams-how-to-manage-perpetual-subscription-and-block-behaviour
+		Block: 1 * time.Second,
+	}).Result()
+	if err != nil {
+		if err != redis.Nil {
+			return nil, fmt.Errorf("failed to read messages with: %w", err)
+		}
+
+		return []redis.XMessage{}, nil
+	}
+
+	return resp[0].Messages, nil
 }
 
 func (s *Server) process(m redis.XMessage, r msg.Receiver) error {
@@ -94,7 +140,7 @@ func (s *Server) process(m redis.XMessage, r msg.Receiver) error {
 	}
 
 	// ACK the message to remove it
-	ctx, cancel := context.WithTimeout(s.receiverCtx, 10*time.Second)
+	ctx, cancel := context.WithTimeout(s.receiverCtx, 2*time.Second)
 	defer cancel()
 
 	resp := s.conn.XAck(ctx, s.Stream, s.Group, m.ID)
@@ -159,7 +205,22 @@ func NewServer(client *redis.Client, stream, group, consumer string, opts ...Opt
 		serverCancelFunc:   serverCancelFunc,
 	}
 
+	for _, opt := range opts {
+		if err := opt(srv); err != nil {
+			return nil, err
+		}
+	}
+
 	return srv, nil
+}
+
+func WithConcurrency(c int) func(*Server) error {
+	return func(srv *Server) error {
+		srv.Concurrency = c
+		srv.inFlightQueue = make(chan struct{}, c)
+
+		return nil
+	}
 }
 
 // Topic publishes Messages to a Redis Stream.

@@ -48,11 +48,71 @@ $ go run .
 
 ## Example: Reassign messages 
 
+This example:
+
+* Creates a stream with multiple consumer groups (3)
+* Creates 2 consumers for one of the groups (`group1`)
+* Writes 2 messages to the stream
+* Srv1 will fail to process the messages
+* A few seconds later, Srv2 starts up. It will poll for a few seconds, then will claim the messages from srv1.
+* Once the messages are processed, they will not be processed again (by the same or the other consumer).
+* The other groups will still have 2 messages to be assigned (`group2`, `group3`).
+
+```bash
+$ cd backends/redis
+$ go run .
+2024/06/24 16:07:09 === Test #2 - Reassigning failed messages with XAUTOCLAIM
+2024/06/24 16:07:09 XREADGROUP
+2024/06/24 16:07:09 Stream=stream2 has messages=2, consumer_groups=2
+2024/06/24 16:07:09 Starting srv1...
+2024/06/24 16:07:09 XREADGROUP
+2024/06/24 16:07:09 XInfoGroups: [{Name:group1 Consumers:0 Pending:0 LastDeliveredID:0-0 EntriesRead:0 Lag:2} {Name:group2 Consumers:0 Pending:0 LastDeliveredID:0-0 EntriesRead:0 Lag:2}]
+2024/06/24 16:07:09 XREADGROUP
+2024/06/24 16:07:09 Simulating a message failure in server1, returning error to re-assign
+2024/06/24 16:07:09 Simulating a message failure in server1, returning error to re-assign
+2024/06/24 16:07:10 Starting srv2...
+2024/06/24 16:07:10 XREADGROUP
+2024/06/24 16:07:10 XInfoGroups: [{Name:group1 Consumers:1 Pending:2 LastDeliveredID:1719259629201-0 EntriesRead:2 Lag:0} {Name:group2 Consumers:0 Pending:0 LastDeliveredID:0-0 EntriesRead:0 Lag:2}]
+2024/06/24 16:07:10 XREADGROUP
+2024/06/24 16:07:10 XREADGROUP
+2024/06/24 16:07:11 XInfoGroups: [{Name:group1 Consumers:2 Pending:2 LastDeliveredID:1719259629201-0 EntriesRead:2 Lag:0} {Name:group2 Consumers:0 Pending:0 LastDeliveredID:0-0 EntriesRead:0 Lag:2}]
+2024/06/24 16:07:11 XREADGROUP
+2024/06/24 16:07:11 XREADGROUP
+2024/06/24 16:07:11 XREADGROUP
+2024/06/24 16:07:12 XInfoGroups: [{Name:group1 Consumers:2 Pending:2 LastDeliveredID:1719259629201-0 EntriesRead:2 Lag:0} {Name:group2 Consumers:0 Pending:0 LastDeliveredID:0-0 EntriesRead:0 Lag:2}]
+2024/06/24 16:07:12 XREADGROUP
+2024/06/24 16:07:12 Returning without error to ACK.
+2024/06/24 16:07:12 Returning without error to ACK.
+2024/06/24 16:07:12 XREADGROUP
+2024/06/24 16:07:12 XREADGROUP
+2024/06/24 16:07:13 XInfoGroups: [{Name:group1 Consumers:2 Pending:0 LastDeliveredID:1719259629201-0 EntriesRead:2 Lag:0} {Name:group2 Consumers:0 Pending:0 LastDeliveredID:0-0 EntriesRead:0 Lag:2}]
+2024/06/24 16:07:13 XREADGROUP
+2024/06/24 16:07:13 XREADGROUP
+2024/06/24 16:07:13 XREADGROUP
+2024/06/24 16:07:14 XInfoGroups: [{Name:group1 Consumers:2 Pending:0 LastDeliveredID:1719259629201-0 EntriesRead:2 Lag:0} {Name:group2 Consumers:0 Pending:0 LastDeliveredID:0-0 EntriesRead:0 Lag:2}]
+2024/06/24 16:07:14 XREADGROUP
+2024/06/24 16:07:14 XREADGROUP
+2024/06/24 16:07:14 XREADGROUP
+2024/06/24 16:07:15 XInfoGroups: [{Name:group1 Consumers:2 Pending:0 LastDeliveredID:1719259629201-0 EntriesRead:2 Lag:0} {Name:group2 Consumers:0 Pending:0 LastDeliveredID:0-0 EntriesRead:0 Lag:2}]
+2024/06/24 16:07:15 XREADGROUP
+2024/06/24 16:07:15 XREADGROUP
+2024/06/24 16:07:15 XREADGROUP
+2024/06/24 16:07:16 XInfoGroups: [{Name:group1 Consumers:2 Pending:0 LastDeliveredID:1719259629201-0 EntriesRead:2 Lag:0} {Name:group2 Consumers:0 Pending:0 LastDeliveredID:0-0 EntriesRead:0 Lag:2}]
+2024/06/24 16:07:16 XREADGROUP
+2024/06/24 16:07:16 XREADGROUP
+2024/06/24 16:07:16 XREADGROUP
+2024/06/24 16:07:17 XInfoGroups: [{Name:group1 Consumers:2 Pending:0 LastDeliveredID:1719259629201-0 EntriesRead:2 Lag:0} {Name:group2 Consumers:0 Pending:0 LastDeliveredID:0-0 EntriesRead:0 Lag:2}]
+2024/06/24 16:07:17 XREADGROUP
+2024/06/24 16:07:17 XREADGROUP
+2024/06/24 16:07:17 XREADGROUP
+2024/06/24 16:07:18 XInfoGroups: [{Name:group1 Consumers:2 Pending:0 LastDeliveredID:1719259629201-0 EntriesRead:2 Lag:0} {Name:group2 Consumers:0 Pending:0 LastDeliveredID:0-0 EntriesRead:0 Lag:2}]
+2024/06/24 16:07:18 XREADGROUP
+2024/06/24 16:07:18 XREADGROUP
+2024/06/24 16:07:18 XREADGROUP
+2024/06/24 16:07:19 Processed all messages!
+```
 
 ## TODO
-
-* I need to figure out how to receive PENDING messages which were not processed by a consumer.
-  
 
 * Despite ACKing messages, they will not be removed from the stream. Which means Redis will grow unbounded.
   To resolve, we could run XTRIM on a cron (Say 3d) which will remove any messages older than that period.
