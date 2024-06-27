@@ -4,6 +4,7 @@ go 1.21
 
 require (
 	github.com/JimWen/gods-generic v0.10.2
+	github.com/asecurityteam/rolling v2.0.4+incompatible
 	github.com/google/go-cmp v0.6.0
 	github.com/pierrec/lz4/v4 v4.1.8
 	go.opencensus.io v0.24.0
@@ -11,6 +12,7 @@ require (
 	go.opentelemetry.io/otel/bridge/opencensus v1.24.0
 	go.opentelemetry.io/otel/sdk v1.24.0
 	go.opentelemetry.io/otel/trace v1.24.0
+	golang.org/x/sync v0.0.0-20190423024810-112230192c58
 )
 
 require (
