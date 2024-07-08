@@ -27,8 +27,7 @@ that backend,
 a concrete implementation
 must be written for it.
 
-Here's a list of backends
-that are currently supported:
+Here's a list of backends that are currently supported:
 
 | Backend       | Link     |
 | :------------- | :------------- |
@@ -142,7 +141,7 @@ which we believe are useful, including:
 * Concrete implementations can be written once
   and distributed as libraries.
 
-* [Decorator Patterns][].
+* Decorator Patterns
 
 * Built-in concurrency controls into *Server*.
 
@@ -151,7 +150,6 @@ which we believe are useful, including:
 
 * Transaction-based *Receivers*.
 
-[Decorator Patterns]: ./doc/decorator_patterns.md
 [pub-sub]: https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern
 [http_handler]: https://golang.org/pkg/net/http/#HandlerFunc.ServeHTTP
 [http_responsewriter]: https://golang.org/pkg/net/http/#ResponseWriter
