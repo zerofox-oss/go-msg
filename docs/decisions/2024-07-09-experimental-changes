@@ -24,7 +24,7 @@ until we are confident that such changes should be accepted.
 We will create an `go-msg/x/` package which will house experimental features.
 We chose this model after [Go's experimental libraries](https://pkg.go.dev/golang.org/x/exp#section-readme).
 
-As a caveat, packages here are **experimental and unreliable**. They may be promoted to the main repository,
+As a caveat, packages here are **experimental and unreliable**. They may be promoted to the main package,
 modified entirely, or removed. 
 
 ## Consequences
