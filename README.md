@@ -1,7 +1,9 @@
 # go-msg
 
-[![GoDoc](https://godoc.org/github.com/zerofox-oss/go-msg?status.svg)](http://godoc.org/github.com/zerofox-oss/go-msg)
-[![Build Status](https://travis-ci.org/zerofox-oss/go-msg.svg?branch=master)](https://travis-ci.org/zerofox-oss/go-msg)
+[![Build Status](https://github.com/zerofox-oss/go-msg/actions/workflows/go.yml/badge.svg)](https://github.com/zerofox-oss/go-msg/actions/workflows/go.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/zerofox-oss/go-msg.svg)](https://pkg.go.dev/github.com/zerofox-oss/go-msg)
+[![Go Report Card](https://goreportcard.com/badge/github.com/zerofox-oss/go-msg)](https://goreportcard.com/report/github.com/zerofox-oss/go-msg)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/zerofox-oss/go-msg/badge)](https://scorecard.dev/viewer/?uri=github.com/zerofox-oss/go-msg)
 
 **Pub/Sub Message Primitives for Go**
 
