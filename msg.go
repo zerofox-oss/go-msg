@@ -157,6 +157,9 @@ type MessageWriter interface {
 	// in an ErrClosedMessageWriter error.
 	io.Closer
 	Attributes() *Attributes
+	// SetDelay sets a duration to delay the message delivery by.
+	// The delay is relative to the time when the message is persisted to the messaging system.
+	// A zero or negative duration means no delay.
 	SetDelay(delay time.Duration)
 }
 

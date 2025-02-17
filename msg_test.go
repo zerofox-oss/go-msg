@@ -1,12 +1,14 @@
 package msg_test
 
 import (
+	"context"
 	"io/ioutil"
 	"net/textproto"
 	"os"
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 
 	msg "github.com/zerofox-oss/go-msg"
 )
@@ -120,5 +122,44 @@ func TestWithBody(t *testing.T) {
 
 	if m.Attributes.Get("test") == mm.Attributes.Get("test") {
 		t.Errorf("message attributes should not be the same")
+	}
+}
+
+type testMessageWriter struct {
+	attrs msg.Attributes
+	delay time.Duration
+}
+
+func (t *testMessageWriter) Write(p []byte) (n int, err error) {
+	return len(p), nil
+}
+
+func (t *testMessageWriter) Close() error {
+	return nil
+}
+
+func (t *testMessageWriter) Attributes() *msg.Attributes {
+	return &t.attrs
+}
+
+func (t *testMessageWriter) SetDelay(d time.Duration) {
+	t.delay = d
+}
+
+func TestTopicFuncNewWriter(t *testing.T) {
+	w := &testMessageWriter{}
+	tf := msg.TopicFunc(func(ctx context.Context) msg.MessageWriter {
+		return w
+	})
+
+	mw := tf.NewWriter(context.Background())
+	if mw != w {
+		t.Error("TopicFunc did not return expected MessageWriter")
+	}
+
+	expectedDelay := 5 * time.Second
+	mw.SetDelay(expectedDelay)
+	if w.delay != expectedDelay {
+		t.Errorf("SetDelay(%v) = %v, want %v", expectedDelay, w.delay, expectedDelay)
 	}
 }
