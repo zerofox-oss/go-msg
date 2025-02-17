@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"net/textproto"
+	"time"
 )
 
 // Attributes represent the key-value metadata for a Message.
@@ -156,6 +157,7 @@ type MessageWriter interface {
 	// in an ErrClosedMessageWriter error.
 	io.Closer
 	Attributes() *Attributes
+	SetDelay(delay time.Duration)
 }
 
 // Topic is a generic interface where messages are sent in a messaging system.

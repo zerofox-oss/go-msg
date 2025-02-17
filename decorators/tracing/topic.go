@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/zerofox-oss/go-msg"
 	"go.opencensus.io/trace"
@@ -40,7 +41,7 @@ func Topic(next msg.Topic, opts ...Option) msg.Topic {
 			trace.WithSampler(options.StartOptions.Sampler),
 		)
 
-		return &TracingWriter{
+		return &tracingWriter{
 			Next:    next.NewWriter(ctx),
 			ctx:     tracingCtx,
 			onClose: span.End,
@@ -49,7 +50,7 @@ func Topic(next msg.Topic, opts ...Option) msg.Topic {
 	})
 }
 
-type TracingWriter struct {
+type tracingWriter struct {
 	Next msg.MessageWriter
 
 	buf    bytes.Buffer
@@ -65,13 +66,15 @@ type TracingWriter struct {
 }
 
 // Attributes returns the attributes associated with the MessageWriter.
-func (w *TracingWriter) Attributes() *msg.Attributes {
+func (w *tracingWriter) Attributes() *msg.Attributes {
 	return w.Next.Attributes()
 }
 
+func (w *tracingWriter) SetDelay(_ time.Duration) {}
+
 // Close adds tracing message attributes
 // writing to the next MessageWriter.
-func (w *TracingWriter) Close() error {
+func (w *tracingWriter) Close() error {
 	w.mux.Lock()
 	defer w.mux.Unlock()
 	defer w.onClose()
@@ -110,7 +113,7 @@ func (w *TracingWriter) Close() error {
 }
 
 // Write writes bytes to an internal buffer.
-func (w *TracingWriter) Write(b []byte) (int, error) {
+func (w *tracingWriter) Write(b []byte) (int, error) {
 	w.mux.Lock()
 	defer w.mux.Unlock()
 

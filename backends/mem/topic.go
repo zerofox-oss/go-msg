@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"sync"
+	"time"
 
 	"github.com/zerofox-oss/go-msg"
 )
@@ -32,7 +33,7 @@ func (t *Topic) NewWriter(context.Context) msg.MessageWriter {
 type MessageWriter struct {
 	msg.MessageWriter
 
-	c chan (*msg.Message)
+	c chan *msg.Message
 
 	attributes msg.Attributes
 	buf        *bytes.Buffer // internal buffer
@@ -43,6 +44,10 @@ type MessageWriter struct {
 // Attributes returns the attributes of the MessageWriter.
 func (w *MessageWriter) Attributes() *msg.Attributes {
 	return &w.attributes
+}
+
+func (w *MessageWriter) SetDelay(_ time.Duration) {
+	return
 }
 
 // Close publishes a Message to a channel.
