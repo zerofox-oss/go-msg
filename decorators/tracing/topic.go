@@ -40,7 +40,7 @@ func Topic(next msg.Topic, opts ...Option) msg.Topic {
 			trace.WithSampler(options.StartOptions.Sampler),
 		)
 
-		return &tracingWriter{
+		return &TracingWriter{
 			Next:    next.NewWriter(ctx),
 			ctx:     tracingCtx,
 			onClose: span.End,
@@ -49,7 +49,7 @@ func Topic(next msg.Topic, opts ...Option) msg.Topic {
 	})
 }
 
-type tracingWriter struct {
+type TracingWriter struct {
 	Next msg.MessageWriter
 
 	buf    bytes.Buffer
@@ -65,13 +65,13 @@ type tracingWriter struct {
 }
 
 // Attributes returns the attributes associated with the MessageWriter.
-func (w *tracingWriter) Attributes() *msg.Attributes {
+func (w *TracingWriter) Attributes() *msg.Attributes {
 	return w.Next.Attributes()
 }
 
 // Close adds tracing message attributes
 // writing to the next MessageWriter.
-func (w *tracingWriter) Close() error {
+func (w *TracingWriter) Close() error {
 	w.mux.Lock()
 	defer w.mux.Unlock()
 	defer w.onClose()
@@ -110,7 +110,7 @@ func (w *tracingWriter) Close() error {
 }
 
 // Write writes bytes to an internal buffer.
-func (w *tracingWriter) Write(b []byte) (int, error) {
+func (w *TracingWriter) Write(b []byte) (int, error) {
 	w.mux.Lock()
 	defer w.mux.Unlock()
 
