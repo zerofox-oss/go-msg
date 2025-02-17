@@ -3,6 +3,7 @@ package lz4
 import (
 	"context"
 	"sync"
+	"time"
 
 	"github.com/pierrec/lz4/v4"
 	"github.com/zerofox-oss/go-msg"
@@ -42,6 +43,8 @@ type encodeWriter struct {
 func (w *encodeWriter) Attributes() *msg.Attributes {
 	return w.Next.Attributes()
 }
+
+func (w *encodeWriter) SetDelay(_ time.Duration) {}
 
 // Close calls Close on the lz4 writer before
 // writing bytes to the next MessageWriter.
