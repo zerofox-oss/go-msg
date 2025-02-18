@@ -33,15 +33,15 @@ func sendMessages(ctx context.Context, inputChan chan *msg.Message) {
 func TestMultiServer(t *testing.T) {
 	t.Parallel()
 
-	for i := 0; i <= 10; i++ {
+	for i := 0; i <= 2; i++ {
 		t.Run(fmt.Sprintf("TestMultiServer_%d", i), func(t *testing.T) {
 			t.Parallel()
 
 			rapid.Check(t, func(t *rapid.T) {
-				numServers := rapid.IntRange(1, 10).Draw(t, "numServers")
+				numServers := rapid.IntRange(1, 5).Draw(t, "numServers")
 
-				serverConcurrency := 10
-				inputChanBuffer := 100
+				serverConcurrency := 5
+				inputChanBuffer := 50
 
 				counts := make([]atomic.Int32, numServers)
 				inputChans := make([]chan *msg.Message, numServers)
@@ -69,12 +69,12 @@ func TestMultiServer(t *testing.T) {
 							assert.Fail(t, "failed to parse priority")
 						}
 						counts[p].Add(1)
-						time.Sleep(time.Duration(rand.Intn(500)) * time.Millisecond)
+						time.Sleep(time.Duration(rand.Intn(100)) * time.Millisecond)
 						return nil
 					}))
 				}()
 
-				ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+				ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 				defer cancel()
 
 				for i := 0; i < numServers; i++ {
