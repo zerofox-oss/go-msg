@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/zerofox-oss/go-msg"
 	"go.opencensus.io/trace"
@@ -68,6 +69,8 @@ type tracingWriter struct {
 func (w *tracingWriter) Attributes() *msg.Attributes {
 	return w.Next.Attributes()
 }
+
+func (w *tracingWriter) SetDelay(_ time.Duration) {}
 
 // Close adds tracing message attributes
 // writing to the next MessageWriter.

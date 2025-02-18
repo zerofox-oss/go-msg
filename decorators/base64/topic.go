@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/base64"
 	"sync"
+	"time"
 
 	"github.com/zerofox-oss/go-msg"
 )
@@ -30,6 +31,8 @@ type encodeWriter struct {
 func (w *encodeWriter) Attributes() *msg.Attributes {
 	return w.Next.Attributes()
 }
+
+func (w *encodeWriter) SetDelay(_ time.Duration) {}
 
 // Close base64-encodes the contents of the buffer before
 // writing them to the next MessageWriter.
