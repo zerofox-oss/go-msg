@@ -44,7 +44,9 @@ func (w *encodeWriter) Attributes() *msg.Attributes {
 	return w.Next.Attributes()
 }
 
-func (w *encodeWriter) SetDelay(_ time.Duration) {}
+func (w *encodeWriter) SetDelay(delay time.Duration) {
+	w.Next.SetDelay(delay)
+}
 
 // Close calls Close on the lz4 writer before
 // writing bytes to the next MessageWriter.

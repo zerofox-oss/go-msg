@@ -91,7 +91,9 @@ func (w *tracingWriter) Attributes() *msg.Attributes {
 	return w.Next.Attributes()
 }
 
-func (w *tracingWriter) SetDelay(_ time.Duration) {}
+func (w *tracingWriter) SetDelay(delay time.Duration) {
+	w.Next.SetDelay(delay)
+}
 
 // Close adds tracing message attributes
 // writing to the next MessageWriter.
